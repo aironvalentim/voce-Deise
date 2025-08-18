@@ -1,82 +1,180 @@
-// Função principal quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Configuração do formulário WhatsApp
-    const contactForm = document.getElementById("contact-form");
+    // Menu Mobile
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const mobileMenuContainer = document.querySelector('.mobile-menu-container');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const closeMenu = document.querySelector('.close-menu');
+    
+    if (mobileMenuToggle && mobileMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+            mobileMenuContainer.style.display = 'block';
+            setTimeout(() => {
+                mobileMenu.classList.add('active');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeMenu.addEventListener('click', function() {
+            mobileMenu.classList.remove('active');
+            setTimeout(() => {
+                mobileMenuContainer.style.display = 'none';
+            }, 300);
+            document.body.style.overflow = '';
+        });
+        
+        // Fechar menu ao clicar em um link
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!link.classList.contains('mobile-cta')) {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    mobileMenu.classList.remove('active');
+                    setTimeout(() => {
+                        mobileMenuContainer.style.display = 'none';
+                    }, 300);
+                    document.body.style.overflow = '';
+                    
+                    if (targetElement) {
+                        const headerHeight = document.querySelector('.main-header').offsetHeight;
+                        const targetPosition = targetElement.offsetTop - headerHeight;
+                        
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+    }
+    
+    // Formulário de Contato
+    const contactForm = document.getElementById('contact-form');
     if (contactForm) {
-        contactForm.addEventListener("submit", function(e) {
+        contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const nome = document.getElementById('nome')?.value || '';
-            const email = document.getElementById('email')?.value || '';
-            const mensagem = document.getElementById('mensagem')?.value || '';
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const mensagem = document.getElementById('mensagem').value;
             
-            const numeroWhatsapp = "5581997881621";
-            const texto = `Olá, meu nome é ${nome} (${email}).%0A%0A${encodeURIComponent(mensagem)}`;
-            
-            // Abre o WhatsApp em uma nova janela
-            window.location.href = `https://wa.me/${numeroWhatsapp}?text=${texto}`;
+            if (nome && email && mensagem) {
+                const texto = `Olá, meu nome é ${nome} (${email}).%0A%0A${mensagem}`;
+                window.open(`https://wa.me/5581997881621?text=${encodeURIComponent(texto)}`, '_blank');
+                
+                // Resetar formulário
+                contactForm.reset();
+                
+                // Feedback visual
+                const submitBtn = contactForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-check"></i> Mensagem Enviada';
+                submitBtn.style.backgroundColor = '#4CAF50';
+                
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.style.backgroundColor = '';
+                }, 3000);
+            }
         });
     }
-
-    // 2. Configuração do menu flutuante
-    const menuItems = document.querySelectorAll('.floating-menu a');
-    if (menuItems.length > 0) {
-        const sections = document.querySelectorAll('section');
-        
-        window.addEventListener('scroll', function() {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - sectionHeight / 3)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            
-            menuItems.forEach(item => {
-                item.classList.remove('active');
-                if (current && item.getAttribute('href').includes(current)) {
-                    item.classList.add('active');
-                }
-            });
-        });
-
-        // Ativa item conforme hash na URL
-        const currentSection = window.location.hash;
-        if (currentSection) {
-            const activeItem = document.querySelector(`.floating-menu a[href="${currentSection}"]`);
-            if (activeItem) activeItem.classList.add('active');
+    
+    // Botão flutuante para topo
+    const floatingTop = document.querySelector('.floating-top');
+    
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            floatingTop.classList.add('visible');
+        } else {
+            floatingTop.classList.remove('visible');
         }
-    }
-
-    // 3. Configuração do tema
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-
-    const themeToggle = document.createElement('button');
-    themeToggle.id = 'theme-toggle';
-    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    themeToggle.title = 'Alternar tema';
-    themeToggle.setAttribute('aria-label', 'Alternar entre tema claro e escuro');
-    themeToggle.classList.add('btn', 'primary-btn');
-    document.body.appendChild(themeToggle);
-
-    themeToggle.addEventListener('click', function() {
-        const currentTheme = document.body.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.body.setAttribute('data-theme', newTheme);
-        
-        const icon = this.querySelector('i');
-        icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-        localStorage.setItem('themePreference', newTheme);
     });
-
-    // Carrega tema salvo
-    const savedTheme = localStorage.getItem('themePreference');
-    if (savedTheme) {
-        document.body.setAttribute('data-theme', savedTheme);
-        const icon = themeToggle.querySelector('i');
-        icon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    }
-
+    
+    // Suavizar scroll para links internos
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        if (!anchor.classList.contains('mobile-cta') && !anchor.classList.contains('header-cta')) {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    const headerHeight = document.querySelector('.main-header').offsetHeight;
+                    const targetPosition = targetElement.offsetTop - headerHeight;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Atualizar URL sem recarregar a página
+                    if (history.pushState) {
+                        history.pushState(null, null, targetId);
+                    } else {
+                        window.location.hash = targetId;
+                    }
+                }
+            });
+        }
+    });
+    
+    // Efeito de destaque no header ao rolar
+    const header = document.querySelector('.main-header');
+    
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+            header.style.background = 'var(--secondary-color)';
+            header.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            document.querySelector('.header-logo').style.height = '50px';
+        } else {
+            header.style.background = 'linear-gradient(to right, var(--secondary-color) 0%, var(--dark-color) 100%)';
+            header.style.boxShadow = 'var(--shadow-md)';
+            document.querySelector('.header-logo').style.height = '60px';
+        }
+    });
+    
+    // Animação de elementos ao rolar
+    const animateOnScroll = function() {
+        const elements = document.querySelectorAll('.benefit-card, .module-card, .about-image, .contact-item, .highlight-item');
+        
+        elements.forEach(element => {
+            const elementPosition = element.getBoundingClientRect().top;
+            const screenPosition = window.innerHeight / 1.2;
+            
+            if (elementPosition < screenPosition) {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }
+        });
+    };
+    
+    // Configurar estado inicial para animações
+    const animatedElements = document.querySelectorAll('.benefit-card, .module-card, .about-image, .contact-item, .highlight-item');
+    animatedElements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    });
+    
+    // Verificar na carga inicial
+    animateOnScroll();
+    
+    // Verificar durante o scroll
+    window.addEventListener('scroll', animateOnScroll);
+    
+    // Preloader (opcional)
+    window.addEventListener('load', function() {
+        const preloader = document.querySelector('.preloader');
+        if (preloader) {
+            preloader.style.transition = 'opacity 0.5s ease';
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        }
+    });
 });
