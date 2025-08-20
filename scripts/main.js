@@ -91,7 +91,51 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             floatingTop.classList.remove('visible');
         }
+        
+        // Ajuste dinâmico para evitar sobreposição com conteúdo
+        adjustFloatingElements();
     });
+    
+    // Ajustar elementos flutuantes para não cobrir conteúdo
+    function adjustFloatingElements() {
+        const floatingNav = document.querySelector('.floating-nav');
+        const floatingTopBtn = document.querySelector('.floating-top');
+        
+        if (window.innerWidth <= 768) {
+            // Ajuste adicional para mobile baseado na posição de scroll
+            const scrollPosition = window.pageYOffset;
+            const documentHeight = document.documentElement.scrollHeight;
+            const viewportHeight = window.innerHeight;
+            
+            // Se estiver perto do final da página, ajustar posição
+            if (scrollPosition > documentHeight - viewportHeight - 100) {
+                floatingNav.style.bottom = '8rem';
+                floatingTopBtn.style.bottom = '12.5rem';
+            } else {
+                floatingNav.style.bottom = '6rem';
+                floatingTopBtn.style.bottom = '10.5rem';
+            }
+        }
+    }
+    
+    // Função para ajustar o posicionamento do conteúdo no banner de 250vh
+    function adjustBannerContent() {
+        const banner = document.querySelector('.banner');
+        const bannerContent = document.querySelector('.banner-content');
+        
+        if (banner && bannerContent) {
+            const viewportHeight = window.innerHeight;
+            const bannerHeight = banner.offsetHeight;
+            
+            // Centralizar conteúdo verticalmente no banner de 250vh
+            if (bannerHeight > viewportHeight * 2) {
+                // Para banners muito altos, posicionar o conteúdo mais para cima
+                bannerContent.style.paddingTop = `${viewportHeight * 0.3}px`;
+            } else {
+                bannerContent.style.paddingTop = '0';
+            }
+        }
+    }
     
     // Suavizar scroll para links internos
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -166,6 +210,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Verificar durante o scroll
     window.addEventListener('scroll', animateOnScroll);
     
+    // Prevenir problemas de zoom no iOS
+    document.addEventListener('touchstart', function() {
+        // Prevenir zoom duplo rápido
+    }, { passive: true });
+    
+    // Melhorar comportamento ao zoom
+    let lastZoom = window.devicePixelRatio;
+    window.addEventListener('resize', function() {
+        const currentZoom = window.devicePixelRatio;
+        
+        if (Math.abs(currentZoom - lastZoom) > 0.1) {
+            // Recálculo de posições quando houver zoom significativo
+            setTimeout(animateOnScroll, 100);
+            setTimeout(adjustFloatingElements, 100);
+            setTimeout(adjustBannerContent, 100);
+            lastZoom = currentZoom;
+        }
+    });
+    
     // Preloader (opcional)
     window.addEventListener('load', function() {
         const preloader = document.querySelector('.preloader');
@@ -176,5 +239,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 preloader.style.display = 'none';
             }, 500);
         }
+        
+        // Forçar recálculo após carregamento completo
+        setTimeout(animateOnScroll, 100);
+        setTimeout(adjustFloatingElements, 100);
+        setTimeout(adjustBannerContent, 100);
+        
+        // Ajuste inicial para elementos flutuantes e banner
+        adjustFloatingElements();
+        adjustBannerContent();
     });
+    
+    // Ajustar elementos flutuantes e banner no redimensionamento
+    window.addEventListener('resize', function() {
+        adjustFloatingElements();
+        adjustBannerContent();
+    });
+    
+    // Ajustar banner durante o scroll também
+    window.addEventListener('scroll', function() {
+        adjustBannerContent();
+    });
+
+    // Ajustar elementos flutuantes para não cobrir conteúdo
+function adjustFloatingElements() {
+    const floatingNav = document.querySelector('.floating-nav');
+    const floatingTopBtn = document.querySelector('.floating-top');
+    const floatingWhatsapp = document.querySelector('.floating-whatsapp');
+    
+    if (window.innerWidth <= 768) {
+        // Ajuste adicional para mobile baseado na posição de scroll
+        const scrollPosition = window.pageYOffset;
+        const documentHeight = document.documentElement.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        
+        // Se estiver perto do final da página, ajustar posição
+        if (scrollPosition > documentHeight - viewportHeight - 100) {
+            floatingNav.style.bottom = '9rem';
+            floatingTopBtn.style.bottom = '14rem';
+            if (floatingWhatsapp) {
+                floatingWhatsapp.style.bottom = '2rem';
+            }
+        } else {
+            floatingNav.style.bottom = '7rem';
+            floatingTopBtn.style.bottom = '12rem';
+            if (floatingWhatsapp) {
+                floatingWhatsapp.style.bottom = '2rem';
+            }
+        }
+    } else {
+        // Reset para desktop
+        if (floatingWhatsapp) {
+            floatingWhatsapp.style.bottom = '2rem';
+        }
+    }
+}
 });
