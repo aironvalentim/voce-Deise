@@ -40,9 +40,11 @@
 
 html {
     scroll-behavior: smooth;
+    touch-action: manipulation;
 }
 
 body {
+    padding-bottom: 7rem; /* Espaço para os botões flutuantes no mobile e desktop */
     font-family: 'Segoe UI', 'Roboto', sans-serif;
     line-height: 1.6;
     color: var(--text-color);
@@ -65,6 +67,8 @@ a {
     text-decoration: none;
     color: inherit;
     transition: var(--transition-fast);
+    -webkit-user-select: auto;
+    user-select: auto;
 }
 
 ul {
@@ -106,7 +110,9 @@ img {
 }
 
 .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.75rem 1.5rem;
     border-radius: var(--border-radius);
     font-weight: 600;
@@ -114,9 +120,9 @@ img {
     cursor: pointer;
     transition: var(--transition-normal);
     border: 2px solid transparent;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
+    min-height: 44px;
+    -webkit-user-select: auto;
+    user-select: auto;
 }
 
 .primary-btn {
@@ -249,6 +255,8 @@ img {
     font-size: 1.5rem;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    min-width: 44px;
+    min-height: 44px;
 }
 
 /* Menu Mobile */
@@ -292,6 +300,8 @@ img {
     margin-bottom: 2rem;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    min-width: 44px;
+    min-height: 44px;
 }
 
 .mobile-menu ul {
@@ -308,6 +318,9 @@ img {
     border-bottom: 1px solid rgba(255,255,255,0.1);
     display: block;
     -webkit-tap-highlight-color: transparent;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 .mobile-cta {
@@ -754,7 +767,7 @@ footer {
 .floating-whatsapp {
     position: fixed;
     bottom: 2rem;
-    left: 1.5rem;
+    right: 2rem;      /* Distância da borda direita */
     width: 60px;
     height: 60px;
     background-color: #25D366;
@@ -763,12 +776,11 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 2rem;
     box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-    z-index: 1000; /* MAIOR PRIORIDADE */
+    z-index: 1001; /* MAIOR PRIORIDADE */
     transition: all 0.3s ease;
     animation: pulse-whatsapp 2s infinite;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .floating-whatsapp:hover, .floating-whatsapp:active {
@@ -813,8 +825,8 @@ footer {
 /* Botão Flutuante para Topo - POSIÇÃO CORRIGIDA */
 .floating-top {
     position: fixed;
-    bottom: 11rem; /* POSIÇÃO CORRIGIDA - Abaixo do WhatsApp, acima de tudo */
-    right: 1.5rem;
+    bottom: 14rem; /* POSIÇÃO CORRIGIDA - Abaixo do WhatsApp, acima de tudo */
+    right: 2rem;
     width: 50px;
     height: 50px;
     background-color: var(--primary-color);
@@ -825,11 +837,10 @@ footer {
     justify-content: center;
     font-size: 1.25rem;
     box-shadow: var(--shadow-md);
-    z-index: 999; /* Abaixo do WhatsApp, acima de tudo */
+    z-index: 1003; /* Abaixo do WhatsApp, acima de tudo */
     opacity: 0;
     visibility: hidden;
     transition: var(--transition-normal);
-    -webkit-tap-highlight-color: transparent;
 }
 
 .floating-top.visible {
@@ -845,16 +856,15 @@ footer {
 /* Menu Flutuante de Navegação - PRIORIDADE MAIS BAIXA */
 .floating-nav {
     position: fixed;
-    right: 1.5rem;
-    bottom: 1.5rem;
-    z-index: 998; /* ABAIXO dos outros botões */
+    right: 2rem;
+    bottom: 8rem;
+    z-index: 1002; /* ABAIXO dos outros botões */
 }
 
 .floating-nav ul {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    list-style: none;
 }
 
 .floating-nav-item {
@@ -870,7 +880,6 @@ footer {
     box-shadow: var(--shadow-lg);
     transition: var(--transition-normal);
     position: relative;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .floating-nav-item:hover, .floating-nav-item:active {
@@ -912,11 +921,10 @@ footer {
 @media (max-width: 768px) {
     .floating-whatsapp {
         width: 55px;
-        height: 55px;
+        height: 50px;
         font-size: 1.6rem;
-        bottom: 1.5rem;
-        left: 1rem;
-        z-index: 1000;
+        bottom: 1.2rem;
+        right: 1rem;
     }
     
     .whatsapp-tooltip {
@@ -934,7 +942,7 @@ footer {
         height: 50px;
         font-size: 1.5rem;
         bottom: 1.2rem;
-        left: 0.8rem;
+        right: 0.8rem;
     }
 }
 
@@ -944,7 +952,7 @@ footer {
         height: 45px;
         font-size: 1.3rem;
         bottom: 1rem;
-        left: 0.7rem;
+        right: 0.7rem;
     }
 }
 
@@ -981,32 +989,31 @@ footer {
         height: 50px;
     }
     
-    .mobile-menu-container {
+    /*.mobile-menu-container {
         display: block;
-    }
+    }*/
     
     .section-title {
         font-size: 1.75rem;
     }
     
     .floating-nav {
-        bottom: 8rem !important;
-        z-index: 998;
+        right: 1rem;
+        bottom: 5.5rem;
     }
     
     .floating-nav-item {
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 40px;
         font-size: 1rem;
     }
     
     .floating-top {
         bottom: 10rem !important; /* POSIÇÃO CORRIGIDA */
-        right: 0.8rem;
-        width: 42px;
-        height: 42px;
-        font-size: 1rem;
-        z-index: 999;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
     }
     
     .floating-nav-item::after {
@@ -1015,43 +1022,31 @@ footer {
 }
 
 @media (max-width: 576px) {
-    .section {
-        padding: 3rem 0;
+    body {
+        padding-bottom: 12rem;
     }
-    
-    .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 2rem;
+    .floating-whatsapp {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+        bottom: 1rem;
+        right: 0.7rem;
     }
-    
-    .benefits-grid,
-    .modules-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .mobile-menu {
-        width: 85%;
-    }
-    
-    .floating-nav {
-        bottom: 7rem !important;
-        right: 0.6rem;
-        z-index: 998;
-    }
-    
-    .floating-nav-item {
-        width: 38px;
-        height: 38px;
-        font-size: 0.9rem;
-    }
-    
     .floating-top {
-        bottom: 9rem !important; /* POSIÇÃO CORRIGIDA */
-        right: 0.6rem;
-        width: 38px;
-        height: 38px;
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+        bottom: 5.5rem;
+        right: 0.7rem;
+    }
+    .floating-nav {
+        right: 0.7rem;
+        bottom: 1rem;
+    }
+    .floating-nav-item {
+        width: 35px;
+        height: 35px;
         font-size: 0.9rem;
-        z-index: 999;
     }
 }
 
@@ -1085,8 +1080,7 @@ footer {
 /* Prevenção de problemas de zoom */
 @media (max-width: 768px) {
     body {
-        -webkit-text-size-adjust: 100%;
-        text-size-adjust: 100%;
+        padding-bottom: 10rem; /* Mais espaço para os flutuantes no mobile */
     }
     
     input, select, textarea, button {
@@ -1110,14 +1104,21 @@ img, .btn, .floating-nav-item, .floating-top {
 }
 
 @media screen and (min-width: 769px) {
-    body {
-        zoom: normal;
+    .floating-nav {
+        right: 2rem;
+        bottom: 8rem; /* Menu flutuante acima do WhatsApp */
+        z-index: 1002;
     }
-    
-    .container {
-        width: 100%;
-        max-width: var(--container-width);
-        margin: 0 auto;
+    .floating-whatsapp {
+        right: 2rem;
+        bottom: 2rem; /* WhatsApp logo abaixo do menu flutuante */
+        z-index: 1001;
+        margin-top: 0; /* Remova o margin-top */
+    }
+    .floating-top {
+        right: 2rem;
+        bottom: 14rem; /* Seta de topo acima do menu flutuante */
+        z-index: 1003;
     }
 }
 
@@ -1139,9 +1140,8 @@ img, .btn, .floating-nav-item, .floating-top {
 /* Garantir que todos os elementos interativos sejam clicáveis imediatamente */
 a, button, .btn, input[type="submit"], input[type="button"] {
     cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
+    -webkit-user-select: auto;
+    user-select: auto;
 }
 
 /* Remover estilos de foco padrão e adicionar estilos personalizados */

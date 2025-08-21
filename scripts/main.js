@@ -1,281 +1,258 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar elementos imediatamente
-    initializeMobileMenu();
-    initializeContactForm();
-    initializeScrollEffects();
-    initializeAnimations();
-    initializeTouchImprovements();
-    
-    // Executar ajustes após o carregamento completo
-    window.addEventListener('load', function() {
-        adjustFloatingElements();
-        setTimeout(initializeAnimations, 100);
+// ==============================
+// Utilidades
+// ==============================
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function hasIPhoneNotch() {
+  return /iPhone/.test(navigator.userAgent) && !window.MSStream &&
+         (window.screen.height >= 812 || window.screen.width >= 812);
+}
+
+// Scroll suave
+function smoothScrollTo(targetPosition, duration) {
+  const startPosition = window.pageYOffset;
+  const distance = targetPosition - startPosition;
+  const startTime = performance.now();
+
+  function scrollStep(currentTime) {
+    const elapsedTime = currentTime - startTime;
+    const progress = Math.min(elapsedTime / duration, 1);
+
+    // easeInOutCubic
+    const easeInOut = progress < 0.5
+      ? 4 * progress * progress * progress
+      : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    window.scrollTo(0, startPosition + (distance * easeInOut));
+
+    if (progress < 1) requestAnimationFrame(scrollStep);
+  }
+
+  requestAnimationFrame(scrollStep);
+}
+
+// ==============================
+// Header, Menu Mobile e Navegação
+// ==============================
+function initializeMobileMenu() {
+  const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+  const mobileMenuContainer = document.querySelector('.mobile-menu-container');
+  const mobileMenu = document.querySelector('.mobile-menu');
+  const closeMenu = document.querySelector('.close-menu');
+
+  if (!mobileMenuToggle || !mobileMenu || !mobileMenuContainer || !closeMenu) return;
+
+  const openMobileMenu = () => {
+    mobileMenuContainer.style.display = 'block';
+    setTimeout(() => {
+      mobileMenu.classList.add('active');
+      document.body.classList.add('menu-open');
+    }, 10);
+  };
+
+  const closeMobileMenuFn = () => {
+    mobileMenu.classList.remove('active');
+    setTimeout(() => {
+      mobileMenuContainer.style.display = 'none';
+      document.body.classList.remove('menu-open');
+    }, 300);
+  };
+
+  mobileMenuToggle.addEventListener('click', openMobileMenu, { passive: true });
+  closeMenu.addEventListener('click', closeMobileMenuFn, { passive: true });
+
+  // Fechar clicando fora
+  mobileMenuContainer.addEventListener('click', (e) => {
+    if (e.target === mobileMenuContainer) closeMobileMenuFn();
+  }, { passive: true });
+
+  // Fechar ao clicar em links do menu + scroll suave
+  const menuLinks = mobileMenu.querySelectorAll('a');
+  menuLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href') || '';
+      if (href.startsWith('#')) {
+        e.preventDefault();
+        closeMobileMenuFn();
+        const targetEl = document.querySelector(href);
+        if (targetEl) {
+          const headerHeight = document.querySelector('.main-header')?.offsetHeight || 0;
+          const targetPosition = Math.max(0, targetEl.offsetTop - headerHeight);
+          setTimeout(() => smoothScrollTo(targetPosition, 800), 350);
+        }
+      }
     });
+  });
+}
+
+function initializeScrollEffects() {
+  const floatingTop = document.querySelector('.floating-top');
+  const header = document.querySelector('.main-header');
+  const headerLogo = document.querySelector('.header-logo');
+
+  window.addEventListener('scroll', () => {
+    if (floatingTop) {
+      if (window.pageYOffset > 300) floatingTop.classList.add('visible');
+      else floatingTop.classList.remove('visible');
+    }
+
+    if (header) {
+      if (window.scrollY > 50) {
+        header.style.background = 'var(--secondary-color)';
+        header.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        if (headerLogo) headerLogo.style.height = '50px';
+      } else {
+        header.style.background = 'linear-gradient(to right, var(--secondary-color) 0%, var(--dark-color) 100%)';
+        header.style.boxShadow = 'var(--shadow-md)';
+        if (headerLogo) headerLogo.style.height = '60px';
+      }
+    }
+
+    adjustFloatingElements();
+  });
+
+  // Scroll suave para âncoras internas (fora do menu)
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    if (!anchor.classList.contains('mobile-cta') && !anchor.classList.contains('header-cta')) {
+      anchor.addEventListener('click', function (e) {
+        const targetId = this.getAttribute('href');
+        if (!targetId || targetId === '#') return;
+
+        const targetElement = document.querySelector(targetId);
+        if (!targetElement) return;
+
+        e.preventDefault();
+        const headerHeight = document.querySelector('.main-header')?.offsetHeight || 0;
+        const targetPosition = Math.max(0, targetElement.offsetTop - headerHeight);
+
+        smoothScrollTo(targetPosition, 800);
+
+        if (history.pushState) history.pushState(null, null, targetId);
+        else window.location.hash = targetId;
+      }, { passive: true });
+    }
+  });
+}
+
+// ==============================
+// Animações de Entrada
+// ==============================
+function initializeAnimations() {
+  const animatedElements = document.querySelectorAll('.benefit-card, .module-card, .about-image, .contact-item, .highlight-item');
+  animatedElements.forEach(element => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(20px)';
+    element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  });
+
+  window.addEventListener('scroll', animateOnScroll, { passive: true });
+  animateOnScroll();
+}
+
+function animateOnScroll() {
+  const elements = document.querySelectorAll('.benefit-card, .module-card, .about-image, .contact-item, .highlight-item');
+  const screenPosition = window.innerHeight / 1.2;
+
+  elements.forEach(element => {
+    const rectTop = element.getBoundingClientRect().top;
+    if (rectTop < screenPosition) {
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }
+  });
+}
+
+// ==============================
+// Formulário de Contato
+// ==============================
+function initializeContactForm() {
+  const contactForm = document.getElementById('contact-form');
+  if (!contactForm) return;
+
+  contactForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const nome = document.getElementById('nome')?.value?.trim();
+    const email = document.getElementById('email')?.value?.trim();
+    const mensagem = document.getElementById('mensagem')?.value?.trim();
+
+    if (nome && email && mensagem) {
+      const texto = `Olá, meu nome é ${nome} (${email}).%0A%0A${mensagem}`;
+      window.open(`https://wa.me/5511988607756?text=${encodeURIComponent(texto)}`, '_blank');
+
+      contactForm.reset();
+
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> Mensagem Enviada';
+        submitBtn.style.backgroundColor = '#4CAF50';
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.style.backgroundColor = '';
+        }, 3000);
+      }
+    }
+  });
+}
+
+// ==============================
+// Flutuantes / Layout
+// ==============================
+function adjustFloatingElements() {
+  const floatingNav = document.querySelector('.floating-nav');
+  const floatingTopBtn = document.querySelector('.floating-top');
+  const floatingWhatsapp = document.querySelector('.floating-whatsapp');
+
+  const mobile = window.innerWidth <= 768;
+
+  if (mobile) {
+    const scrollPosition = window.pageYOffset;
+    const documentHeight = document.documentElement.scrollHeight;
+    const viewportHeight = window.innerHeight;
+
+    const nearBottom = scrollPosition > documentHeight - viewportHeight - 100;
+
+    if (floatingNav) floatingNav.style.bottom = nearBottom ? '8rem' : '7rem';
+    if (floatingTopBtn) floatingTopBtn.style.bottom = nearBottom ? '10rem' : '9rem';
+    if (floatingWhatsapp) floatingWhatsapp.style.bottom = nearBottom ? '1.5rem' : '1.2rem';
+  } else {
+    // No desktop, use apenas o CSS, não altere via JS
+    if (floatingNav) floatingNav.style.bottom = '';
+    if (floatingTopBtn) floatingTopBtn.style.bottom = '';
+    if (floatingWhatsapp) floatingWhatsapp.style.bottom = '';
+  }
+
+  if (isIOS() && hasIPhoneNotch()) {
+    if (floatingWhatsapp) floatingWhatsapp.style.bottom = mobile ? '2rem' : '';
+    if (floatingNav) floatingNav.style.bottom = mobile ? '9rem' : '';
+    if (floatingTopBtn) floatingTopBtn.style.bottom = mobile ? '12rem' : '';
+  }
+}
+
+// ==============================
+// Boot
+// ==============================
+document.addEventListener('DOMContentLoaded', () => {
+  initializeMobileMenu();
+  initializeContactForm();
+  initializeScrollEffects();
+  initializeAnimations();
+
+  // Forçar foco para evitar bug de “esperar toque” no mobile
+  //window.focus();
+
+  window.addEventListener('load', () => {
+    adjustFloatingElements();
+    setTimeout(initializeAnimations, 100);
+  });
 });
 
-// Inicializar menu mobile
-function initializeMobileMenu() {
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-    const mobileMenuContainer = document.querySelector('.mobile-menu-container');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    const closeMenu = document.querySelector('.close-menu');
-    
-    if (mobileMenuToggle && mobileMenu) {
-        // Adicionar event listeners
-        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-        closeMenu.addEventListener('click', closeMobileMenu);
-        
-        // Fechar menu ao clicar fora dele
-        mobileMenuContainer.addEventListener('click', function(e) {
-            if (e.target === mobileMenuContainer) {
-                closeMobileMenu();
-            }
-        });
-        
-        // Fechar menu ao clicar em um link (exceto CTA)
-        const mobileLinks = mobileMenu.querySelectorAll('a');
-        mobileLinks.forEach(link => {
-            if (!link.classList.contains('mobile-cta')) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    closeMobileMenu();
-                    
-                    const targetId = link.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    
-                    if (targetElement) {
-                        const headerHeight = document.querySelector('.main-header').offsetHeight;
-                        const targetPosition = targetElement.offsetTop - headerHeight;
-                        
-                        // Pequeno delay para garantir que o menu fechou
-                        setTimeout(() => {
-                            window.scrollTo({
-                                top: targetPosition,
-                                behavior: 'smooth'
-                            });
-                        }, 300);
-                    }
-                });
-            }
-        });
-    }
-}
-
-// Alternar menu mobile
-function toggleMobileMenu() {
-    const mobileMenuContainer = document.querySelector('.mobile-menu-container');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    
-    mobileMenuContainer.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    // Pequeno delay para garantir que o display block foi aplicado
-    setTimeout(() => {
-        mobileMenu.classList.add('active');
-    }, 10);
-}
-
-// Fechar menu mobile
-function closeMobileMenu() {
-    const mobileMenuContainer = document.querySelector('.mobile-menu-container');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    
-    mobileMenu.classList.remove('active');
-    document.body.style.overflow = '';
-    
-    setTimeout(() => {
-        mobileMenuContainer.style.display = 'none';
-    }, 300);
-}
-
-// Inicializar formulário de contato
-function initializeContactForm() {
-    const contactForm = document.getElementById('contact-form');
-    
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const nome = document.getElementById('nome').value;
-            const email = document.getElementById('email').value;
-            const mensagem = document.getElementById('mensagem').value;
-            
-            if (nome && email && mensagem) {
-                const texto = `Olá, meu nome é ${nome} (${email}).%0A%0A${mensagem}`;
-                window.open(`https://wa.me/5511988607756?text=${encodeURIComponent(texto)}`, '_blank');
-                
-                // Resetar formulário
-                contactForm.reset();
-                
-                // Feedback visual
-                const submitBtn = contactForm.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-check"></i> Mensagem Enviada';
-                submitBtn.style.backgroundColor = '#4CAF50';
-                
-                setTimeout(() => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.style.backgroundColor = '';
-                }, 3000);
-            }
-        });
-    }
-}
-
-// Inicializar efeitos de scroll
-function initializeScrollEffects() {
-    const floatingTop = document.querySelector('.floating-top');
-    const header = document.querySelector('.main-header');
-    
-    // Botão flutuante para topo
-    window.addEventListener('scroll', function() {
-        if (window.pageYOffset > 300) {
-            floatingTop.classList.add('visible');
-        } else {
-            floatingTop.classList.remove('visible');
-        }
-        
-        // Efeito de destaque no header ao rolar
-        if (window.scrollY > 50) {
-            header.style.background = 'var(--secondary-color)';
-            header.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-            document.querySelector('.header-logo').style.height = '50px';
-        } else {
-            header.style.background = 'linear-gradient(to right, var(--secondary-color) 0%, var(--dark-color) 100%)';
-            header.style.boxShadow = 'var(--shadow-md)';
-            document.querySelector('.header-logo').style.height = '60px';
-        }
-        
-        // Ajustar elementos flutuantes
-        adjustFloatingElements();
-        
-        // Executar animações durante o scroll
-        animateOnScroll();
-    });
-    
-    // Suavizar scroll para links internos
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        if (!anchor.classList.contains('mobile-cta') && !anchor.classList.contains('header-cta')) {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                
-                if (targetElement) {
-                    const headerHeight = document.querySelector('.main-header').offsetHeight;
-                    const targetPosition = targetElement.offsetTop - headerHeight;
-                    
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: 'smooth'
-                    });
-                    
-                    // Atualizar URL sem recarregar a página
-                    if (history.pushState) {
-                        history.pushState(null, null, targetId);
-                    } else {
-                        window.location.hash = targetId;
-                    }
-                }
-            });
-        }
-    });
-}
-
-// Inicializar animações
-function initializeAnimations() {
-    // Configurar estado inicial para animações
-    const animatedElements = document.querySelectorAll('.benefit-card, .module-card, .about-image, .contact-item, .highlight-item');
-    animatedElements.forEach(element => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(20px)';
-        element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    });
-    
-    // Verificar durante o scroll
-    window.addEventListener('scroll', animateOnScroll);
-    
-    // Verificar na carga inicial
-    animateOnScroll();
-}
-
-// Animação de elementos ao rolar
-function animateOnScroll() {
-    const elements = document.querySelectorAll('.benefit-card, .module-card, .about-image, .contact-item, .highlight-item');
-    
-    elements.forEach(element => {
-        const elementPosition = element.getBoundingClientRect().top;
-        const screenPosition = window.innerHeight / 1.2;
-        
-        if (elementPosition < screenPosition) {
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
-        }
-    });
-}
-
-// Ajustar elementos flutuantes para não cobrir conteúdo
-function adjustFloatingElements() {
-    const floatingNav = document.querySelector('.floating-nav');
-    const floatingTopBtn = document.querySelector('.floating-top');
-    const floatingWhatsapp = document.querySelector('.floating-whatsapp');
-    
-    if (window.innerWidth <= 768) {
-        // Ajuste adicional para mobile baseado na posição de scroll
-        const scrollPosition = window.pageYOffset;
-        const documentHeight = document.documentElement.scrollHeight;
-        const viewportHeight = window.innerHeight;
-        
-        // Se estiver perto do final da página, ajustar posição
-        if (scrollPosition > documentHeight - viewportHeight - 100) {
-            floatingNav.style.bottom = '8rem';
-            floatingTopBtn.style.bottom = '10rem';
-            if (floatingWhatsapp) {
-                floatingWhatsapp.style.bottom = '1.5rem';
-            }
-        } else {
-            floatingNav.style.bottom = '7rem';
-            floatingTopBtn.style.bottom = '9rem';
-            if (floatingWhatsapp) {
-                floatingWhatsapp.style.bottom = '1.2rem';
-            }
-        }
-    } else {
-        // Reset para desktop
-        floatingNav.style.bottom = '1.5rem';
-        floatingTopBtn.style.bottom = '11rem';
-        if (floatingWhatsapp) {
-            floatingWhatsapp.style.bottom = '2rem';
-        }
-    }
-}
-
-// Inicializar melhorias para touch
-function initializeTouchImprovements() {
-    // Detectar dispositivos touch
-    document.addEventListener('touchstart', function() {
-        document.body.classList.add('touch-device');
-    }, { once: true });
-    
-    // Prevenir comportamentos padrão indesejados em toque
-    document.addEventListener('touchmove', function(e) {
-        if (e.target.tagName === 'A' && e.target.getAttribute('href') === '#') {
-            e.preventDefault();
-        }
-    });
-    
-    // Melhorar acessibilidade em dispositivos móveis
-    if ('ontouchstart' in window) {
-        // Aumentar área de toque para botões em dispositivos móveis
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.style.minHeight = '44px';
-            btn.style.display = 'flex';
-            btn.style.alignItems = 'center';
-            btn.style.justifyContent = 'center';
-        });
-        
-        // Ajustar elementos flutuantes no redimensionamento
-        window.addEventListener('resize', adjustFloatingElements);
-    }
-}
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    adjustFloatingElements();
+    window.dispatchEvent(new Event('resize'));
+  }, 300);
+});
