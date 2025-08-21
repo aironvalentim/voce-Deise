@@ -35,6 +35,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -47,6 +48,8 @@ body {
     color: var(--text-color);
     background-color: var(--light-color);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -111,6 +114,9 @@ img {
     cursor: pointer;
     transition: var(--transition-normal);
     border: 2px solid transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 
 .primary-btn {
@@ -118,7 +124,7 @@ img {
     color: var(--text-light);
 }
 
-.primary-btn:hover {
+.primary-btn:hover, .primary-btn:active {
     background-color: var(--primary-dark);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
@@ -130,7 +136,7 @@ img {
     border-color: var(--primary-color);
 }
 
-.secondary-btn:hover {
+.secondary-btn:hover, .secondary-btn:active {
     background-color: var(--primary-color);
     color: var(--text-light);
     transform: translateY(-2px);
@@ -142,7 +148,7 @@ img {
     color: var(--text-light);
 }
 
-.whatsapp-btn:hover {
+.whatsapp-btn:hover, .whatsapp-btn:active {
     background-color: #128C7E;
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
@@ -154,7 +160,7 @@ img {
     width: 100%;
 }
 
-.submit-btn:hover {
+.submit-btn:hover, .submit-btn:active {
     background-color: var(--dark-color);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
@@ -229,7 +235,7 @@ img {
     white-space: nowrap;
 }
 
-.header-cta:hover {
+.header-cta:hover, .header-cta:active {
     background-color: var(--primary-dark);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
@@ -242,6 +248,7 @@ img {
     color: var(--text-light);
     font-size: 1.5rem;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Menu Mobile */
@@ -284,6 +291,7 @@ img {
     color: var(--text-light);
     margin-bottom: 2rem;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-menu ul {
@@ -299,6 +307,7 @@ img {
     padding: 0.5rem 0;
     border-bottom: 1px solid rgba(255,255,255,0.1);
     display: block;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-cta {
@@ -472,8 +481,8 @@ img {
     box-shadow: var(--shadow-sm);
     transition: var(--transition-normal);
     text-align: center;
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .benefit-card:hover {
@@ -520,8 +529,8 @@ img {
     transition: var(--transition-normal);
     display: flex;
     gap: 1.5rem;
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .module-card:hover {
@@ -579,8 +588,8 @@ img {
     border-radius: var(--border-radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .about-image img {
@@ -607,8 +616,8 @@ img {
     display: flex;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .highlight-item i {
@@ -634,8 +643,8 @@ img {
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .contact-item i {
@@ -662,6 +671,7 @@ img {
     border-radius: var(--border-radius);
     font-family: inherit;
     transition: var(--transition-fast);
+    font-size: 16px; /* Prevenir zoom no iOS */
 }
 
 .form-group textarea {
@@ -758,9 +768,10 @@ footer {
     z-index: 1000; /* MAIOR PRIORIDADE */
     transition: all 0.3s ease;
     animation: pulse-whatsapp 2s infinite;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.floating-whatsapp:hover {
+.floating-whatsapp:hover, .floating-whatsapp:active {
     background-color: #128C7E;
     transform: scale(1.1);
     box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
@@ -818,6 +829,7 @@ footer {
     opacity: 0;
     visibility: hidden;
     transition: var(--transition-normal);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .floating-top.visible {
@@ -825,7 +837,7 @@ footer {
     visibility: visible;
 }
 
-.floating-top:hover {
+.floating-top:hover, .floating-top:active {
     background-color: var(--primary-dark);
     transform: translateY(-5px);
 }
@@ -858,9 +870,10 @@ footer {
     box-shadow: var(--shadow-lg);
     transition: var(--transition-normal);
     position: relative;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.floating-nav-item:hover {
+.floating-nav-item:hover, .floating-nav-item:active {
     background-color: var(--primary-dark);
     transform: translateY(-5px) scale(1.1);
 }
@@ -869,7 +882,7 @@ footer {
     background-color: var(--secondary-color);
 }
 
-.floating-nav-item.cta:hover {
+.floating-nav-item.cta:hover, .floating-nav-item.cta:active {
     background-color: var(--dark-color);
 }
 
@@ -910,7 +923,7 @@ footer {
         display: none;
     }
     
-    .floating-whatsapp:hover {
+    .floating-whatsapp:hover, .floating-whatsapp:active {
         transform: scale(1.05);
     }
 }
@@ -1106,4 +1119,42 @@ img, .btn, .floating-nav-item, .floating-top {
         max-width: var(--container-width);
         margin: 0 auto;
     }
+}
+
+/* Melhorias para dispositivos touch */
+.touch-device .btn,
+.touch-device .floating-nav-item,
+.touch-device .floating-whatsapp,
+.touch-device .floating-top {
+    transition: all 0.15s ease;
+}
+
+.touch-device .btn:active,
+.touch-device .floating-nav-item:active,
+.touch-device .floating-whatsapp:active,
+.touch-device .floating-top:active {
+    transform: scale(0.95);
+}
+
+/* Garantir que todos os elementos interativos sejam clicáveis imediatamente */
+a, button, .btn, input[type="submit"], input[type="button"] {
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+/* Remover estilos de foco padrão e adicionar estilos personalizados */
+*:focus {
+    outline: none;
+}
+
+.btn:focus-visible,
+.floating-nav-item:focus-visible,
+.floating-whatsapp:focus-visible,
+.floating-top:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
