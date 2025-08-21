@@ -49,6 +49,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+        
+        // Fechar menu ao clicar fora dele
+        mobileMenuContainer.addEventListener('click', function(e) {
+            if (e.target === mobileMenuContainer) {
+                mobileMenu.classList.remove('active');
+                setTimeout(() => {
+                    mobileMenuContainer.style.display = 'none';
+                }, 300);
+                document.body.style.overflow = '';
+            }
+        });
     }
     
     // Formulário de Contato
@@ -228,4 +239,36 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', function() {
         adjustFloatingElements();
     });
+    
+    // Melhorias de toque para dispositivos móveis
+    document.addEventListener('touchstart', function() {
+        // Adicionar classe de toque ao body para estilização específica
+        document.body.classList.add('touch-device');
+    }, { once: true });
+    
+    // Prevenir comportamentos padrão indesejados em toque
+    document.addEventListener('touchmove', function(e) {
+        if (e.target.tagName === 'A' && e.target.getAttribute('href') === '#') {
+            e.preventDefault();
+        }
+    });
+    
+    // Melhorar acessibilidade em dispositivos móveis
+    if ('ontouchstart' in window) {
+        // Aumentar área de toque para botões em dispositivos móveis
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.style.minHeight = '44px';
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+        });
+        
+        // Aumentar área de toque para links de navegação
+        document.querySelectorAll('nav a').forEach(link => {
+            link.style.padding = '12px 8px';
+            link.style.minHeight = '44px';
+            link.style.display = 'flex';
+            link.style.alignItems = 'center';
+        });
+    }
 });
